@@ -1,10 +1,11 @@
 package server;
 
 import javafx.util.Pair;
+import server.models.Course;
+import server.models.RegistrationForm;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
+import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -12,14 +13,31 @@ import java.util.Arrays;
 
 public class Server {
 
+    /**
+     * Le client souhaite s'inscrire à un cours.
+     */
     public final static String REGISTER_COMMAND = "INSCRIRE";
+    /**
+     * Le client souhaite charger la liste de cours disponible.
+     */
     public final static String LOAD_COMMAND = "CHARGER";
+    /**
+     * "Socket" du serveur.
+     */
     private final ServerSocket server;
+    /**
+     * "Socket" du client.
+     */
     private Socket client;
     private ObjectInputStream objectInputStream;
     private ObjectOutputStream objectOutputStream;
     private final ArrayList<EventHandler> handlers;
 
+    /**
+     * Constructeur de la classe Serveur.
+     * @param port Port auquel le serveur écoutera.
+     * @throws IOException
+     */
     public Server(int port) throws IOException {
         this.server = new ServerSocket(port, 1);
         this.handlers = new ArrayList<EventHandler>();
@@ -91,7 +109,24 @@ public class Server {
      @throws Exception si une erreur se produit lors de la lecture du fichier ou de l'écriture de l'objet dans le flux
      */
     public void handleLoadCourses(String arg) {
-        // TODO: implémenter cette méthode
+        try {
+            FileReader coursesTxt = new FileReader("src/main/java/server/data/cours.txt");
+            BufferedReader reader = new BufferedReader(coursesTxt);
+            ArrayList<Course> requestedCourses = new ArrayList<>();
+            String currentLine;
+            while ((currentLine = reader.readLine()) != null) {
+                String[] tempCourse = currentLine.split("\t");
+                if (tempCourse[2].equals(arg)) {
+                    requestedCourses.add(new Course(tempCourse[0], tempCourse[1], tempCourse[2]));
+                    System.out.println(requestedCourses);
+                }
+            }
+            objectOutputStream.writeObject(requestedCourses);
+            objectOutputStream.flush();
+            reader.close();
+        }  catch (IOException e) {
+            System.out.println(e);
+        }
     }
 
     /**
@@ -100,7 +135,20 @@ public class Server {
      @throws Exception si une erreur se produit lors de la lecture de l'objet, l'écriture dans un fichier ou dans le flux de sortie.
      */
     public void handleRegistration() {
-        // TODO: implémenter cette méthode
+        try {
+            RegistrationForm registration = (RegistrationForm) objectInputStream.readObject();
+
+            FileWriter fw = new FileWriter("data/inscription.txt");
+            BufferedWriter writer = new BufferedWriter(fw);
+            Course cours = registration.getCourse();
+            writer.append(cours.getSession() + "\t" + cours.getCode() + "\t" + registration.getMatricule() + "\t" +
+                    registration.getPrenom() + "\t" + registration.getNom() + "\t" + registration.getEmail());
+        } catch (ClassNotFoundException ex) {
+
+        } catch (IOException ex) {
+
+        }
+
     }
 }
 
