@@ -86,7 +86,7 @@ public class Client {
             }
         }
         private void selectAction() {
-            responseTray.add("1. Consulter les cours offerts pour une autre session\n");
+            responseTray.add("\n1. Consulter les cours offerts pour une autre session\n");
             responseTray.add("2. Inscription à un cours\n");
             promptChoice(false);
             if(userInput == 1) {
