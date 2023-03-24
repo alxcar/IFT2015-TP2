@@ -138,7 +138,7 @@ public class Server {
         try {
             RegistrationForm registration = (RegistrationForm) objectInputStream.readObject();
 
-            FileWriter fw = new FileWriter("data/inscription.txt");
+            FileWriter fw = new FileWriter("src/main/java/server/data/inscription.txt");
             BufferedWriter writer = new BufferedWriter(fw);
             Course cours = registration.getCourse();
             writer.append(cours.getSession() + "\t" + cours.getCode() + "\t" + registration.getMatricule() + "\t" +
