@@ -95,6 +95,7 @@ public class Server {
 
     public void handleEvents(String cmd, String arg) {
         if (cmd.equals(REGISTER_COMMAND)) {
+            System.out.println(1);
             handleRegistration();
         } else if (cmd.equals(LOAD_COMMAND)) {
             handleLoadCourses(arg);
@@ -118,7 +119,6 @@ public class Server {
                 String[] tempCourse = currentLine.split("\t");
                 if (tempCourse[2].equals(arg)) {
                     requestedCourses.add(new Course(tempCourse[0], tempCourse[1], tempCourse[2]));
-                    System.out.println(requestedCourses);
                 }
             }
             objectOutputStream.writeObject(requestedCourses);
@@ -137,7 +137,6 @@ public class Server {
     public void handleRegistration() {
         try {
             RegistrationForm registration = (RegistrationForm) objectInputStream.readObject();
-
             FileWriter fw = new FileWriter("src/main/java/server/data/inscription.txt");
             BufferedWriter writer = new BufferedWriter(fw);
             Course cours = registration.getCourse();
