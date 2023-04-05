@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Client {
-        private int IP;
+        private String IP;
         private int port;
         private int userInput;
         private String userInfo;
@@ -23,18 +23,28 @@ public class Client {
         private final ArrayList<String> availableSemesters = new ArrayList<>(Arrays.asList("Automne", "Hiver", "Ete"));
         private String semester;
         public Client(String IP, int port) {
-            try {
-                clientSocket = new Socket(IP, port);
-
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            this.IP = IP;
+            this.port = port;
         }
 
         public void run() {
             responseTray.add("*** Bienvenue au portail d'inscription de cours de l'UDEM ***\n");
             emptyResponseTray();
+            main();
+        }
+
+        public void main() {
+            try {
+                clientSocket = new Socket(IP, port);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                oos = new ObjectOutputStream(clientSocket.getOutputStream());
+                ois = new ObjectInputStream(clientSocket.getInputStream());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             selectSemester();
         }
 
@@ -68,16 +78,20 @@ public class Client {
             Scanner scan = new Scanner(System.in);
             userInfo = scan.next();
         }
+
+        public void disconnect() throws IOException {
+            oos.close();
+            ois.close();
+            clientSocket.close();
+        }
         private void requestCourses(String semester) {
             //emptyResponseTray(); -- necessaire ou pas??
             responseTray.add("Les cours offerts pendant la session d'" + semester.toLowerCase() +" sont: \n");
             try {
-                oos = new ObjectOutputStream(clientSocket.getOutputStream());
-                ois = new ObjectInputStream(clientSocket.getInputStream());
                 oos.writeObject("CHARGER " + semester);
+                oos.flush();
                 requestedCourses = (ArrayList<Course>) ois.readObject();
-                oos.close();
-                ois.close();
+                disconnect();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } catch (ClassNotFoundException e) {
@@ -96,7 +110,7 @@ public class Client {
             responseTray.add("2. Inscription à un cours\n");
             promptChoice(false);
             if(userInput == 1) {
-                selectSemester();
+                run();
             } else if (userInput == 2) {
                 register2Class();
             }
