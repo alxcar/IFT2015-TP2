@@ -11,9 +11,10 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Client {
-        private int IP;
+        private String IP;
         private int port;
         private int userInput;
+        private String userInfo;
         private Socket clientSocket;
         private ObjectOutputStream oos;
         private ObjectInputStream ois;
@@ -22,20 +23,29 @@ public class Client {
         private final ArrayList<String> availableSemesters = new ArrayList<>(Arrays.asList("Automne", "Hiver", "Ete"));
         private String semester;
         public Client(String IP, int port) {
-            try {
-                clientSocket = new Socket(IP, port);
-                oos = new ObjectOutputStream(clientSocket.getOutputStream());
-                ois = new ObjectInputStream(clientSocket.getInputStream());
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            this.IP = IP;
+            this.port = port;
         }
 
         public void run() {
             responseTray.add("*** Bienvenue au portail d'inscription de cours de l'UDEM ***\n");
             emptyResponseTray();
-            semesterPrompt();
+            main();
+        }
+
+        public void main() {
+            try {
+                clientSocket = new Socket(IP, port);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                oos = new ObjectOutputStream(clientSocket.getOutputStream());
+                ois = new ObjectInputStream(clientSocket.getInputStream());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            selectSemester();
         }
 
         private void emptyResponseTray() {
@@ -44,21 +54,14 @@ public class Client {
                         responseTray.remove(0);
             }
         }
-        private void semesterPrompt() {
-            selectSemester();
-            requestCourses(semester);
-            emptyResponseTray();
-            // Sketchy workaround, will fix later
-            promptChoice(true);
-            selectAction();
-        }
         private void selectSemester() {
             responseTray.add("Veuillez choisir la session pour laquelle vous voulez concuslter la liste des cours:\n");
             for (int i = 0; i < availableSemesters.size(); i++) {
                 responseTray.add(i+1 + ". " + availableSemesters.get(i) + "\n");
             }
             promptChoice(false);
-            semester = availableSemesters.get(userInput);
+            semester = availableSemesters.get(userInput-1);
+            requestCourses(semester);
         }
 
         private void promptChoice(Boolean empty) {
@@ -66,15 +69,29 @@ public class Client {
             emptyResponseTray();
             if (!empty) {
                 Scanner scan = new Scanner(System.in);
-                userInput = scan.nextInt() - 1;
+                userInput = scan.nextInt();
             }
         }
+        // honnetement stupide, y'a moyen de merge promptChoice et PromptInfo
+        private void promptInfo(){
+            emptyResponseTray();
+            Scanner scan = new Scanner(System.in);
+            userInfo = scan.next();
+        }
 
+        public void disconnect() throws IOException {
+            oos.close();
+            ois.close();
+            clientSocket.close();
+        }
         private void requestCourses(String semester) {
+            //emptyResponseTray(); -- necessaire ou pas??
             responseTray.add("Les cours offerts pendant la session d'" + semester.toLowerCase() +" sont: \n");
             try {
                 oos.writeObject("CHARGER " + semester);
+                oos.flush();
                 requestedCourses = (ArrayList<Course>) ois.readObject();
+                disconnect();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } catch (ClassNotFoundException e) {
@@ -84,13 +101,16 @@ public class Client {
             for (int i = 0; i < requestedCourses.size(); i++) {
                 responseTray.add(i+1 + ". " + requestedCourses.get(i).getCode() + "\t" + requestedCourses.get(i).getName() + "\n");
             }
+            // Sketchy workaround, will fix later
+            promptChoice(true);
+            selectAction();
         }
         private void selectAction() {
             responseTray.add("\n1. Consulter les cours offerts pour une autre session\n");
             responseTray.add("2. Inscription à un cours\n");
             promptChoice(false);
             if(userInput == 1) {
-                selectSemester();
+                run();
             } else if (userInput == 2) {
                 register2Class();
             }
@@ -98,10 +118,15 @@ public class Client {
         }
         public void register2Class() {
             responseTray.add("Veuillez saisir votre prénom: ");
+            promptInfo();
             responseTray.add("Veuillez saisir votre nom: ");
+            promptInfo();
             responseTray.add("Veuillez saisir votre email: ");
+            promptInfo();
             responseTray.add("Veuillez saisir votre matricule: ");
+            promptInfo();
             responseTray.add("Veuillez saisir le code du cours: ");
+            promptInfo();
         }
 
 }
