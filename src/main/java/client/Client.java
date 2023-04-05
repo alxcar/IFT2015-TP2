@@ -119,14 +119,30 @@ public class Client {
         public void register2Class() {
             responseTray.add("Veuillez saisir votre prénom: ");
             promptInfo();
+            String firstName = userInfo;
             responseTray.add("Veuillez saisir votre nom: ");
             promptInfo();
+            String name = userInfo;
             responseTray.add("Veuillez saisir votre email: ");
             promptInfo();
+            String email = userInfo;
             responseTray.add("Veuillez saisir votre matricule: ");
             promptInfo();
+            String code = userInfo;
             responseTray.add("Veuillez saisir le code du cours: ");
             promptInfo();
+            String courseCode = userInfo;
+            try{
+                clientSocket = new Socket(IP, port);
+                oos = new ObjectOutputStream(clientSocket.getOutputStream());
+                ois = new ObjectInputStream(clientSocket.getInputStream());
+                oos.writeObject("INSCRIRE ");
+                oos.flush();
+                oos.writeObject(firstName + name + email + code + courseCode);
+                disconnect();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
 }

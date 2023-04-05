@@ -137,12 +137,12 @@ public class Server {
     public void handleRegistration() {
         try {
             RegistrationForm registration = (RegistrationForm) objectInputStream.readObject();
-
             FileWriter fw = new FileWriter("src/main/java/server/data/inscription.txt");
             BufferedWriter writer = new BufferedWriter(fw);
             Course cours = registration.getCourse();
             writer.append(cours.getSession() + "\t" + cours.getCode() + "\t" + registration.getMatricule() + "\t" +
                     registration.getPrenom() + "\t" + registration.getNom() + "\t" + registration.getEmail());
+            writer.close();
         } catch (ClassNotFoundException ex) {
 
         } catch (IOException ex) {
