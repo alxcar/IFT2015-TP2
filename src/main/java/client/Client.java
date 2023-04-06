@@ -1,11 +1,10 @@
 package client;
 
-import server.Server;
 import server.models.Course;
+import server.models.RegistrationForm;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -132,17 +131,38 @@ public class Client {
             responseTray.add("Veuillez saisir le code du cours: ");
             promptInfo();
             String courseCode = userInfo;
+
+            RegistrationForm registration = new RegistrationForm(firstName, name,  email, code,  findCourse(courseCode));
             try{
                 clientSocket = new Socket(IP, port);
                 oos = new ObjectOutputStream(clientSocket.getOutputStream());
                 ois = new ObjectInputStream(clientSocket.getInputStream());
                 oos.writeObject("INSCRIRE ");
                 oos.flush();
-                oos.writeObject(firstName + name + email + code + courseCode);
+                oos.writeObject(registration);
                 disconnect();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        // absolument horrible et illegal
+        public Course findCourse(String code) {
+            try {
+                int index = -1;
+
+                for (int i = 0; i < requestedCourses.size(); i++) {
+                    if (requestedCourses.get(i).getCode().equals(code)) {
+                        index = i;
+                        break;
+                    }
+                    ;
+                }
+                return (requestedCourses.get(index));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
         }
 
 }

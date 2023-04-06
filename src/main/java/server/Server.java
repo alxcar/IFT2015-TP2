@@ -117,7 +117,7 @@ public class Server {
             while ((currentLine = reader.readLine()) != null) {
                 String[] tempCourse = currentLine.split("\t");
                 if (tempCourse[2].equals(arg)) {
-                    requestedCourses.add(new Course(tempCourse[0], tempCourse[1], tempCourse[2]));
+                    requestedCourses.add(new Course(tempCourse[1], tempCourse[0], tempCourse[2]));
                     System.out.println(requestedCourses);
                 }
             }
@@ -137,11 +137,11 @@ public class Server {
     public void handleRegistration() {
         try {
             RegistrationForm registration = (RegistrationForm) objectInputStream.readObject();
-            FileWriter fw = new FileWriter("src/main/java/server/data/inscription.txt");
+            FileWriter fw = new FileWriter("src/main/java/server/data/inscription.txt", true);
             BufferedWriter writer = new BufferedWriter(fw);
             Course cours = registration.getCourse();
             writer.append(cours.getSession() + "\t" + cours.getCode() + "\t" + registration.getMatricule() + "\t" +
-                    registration.getPrenom() + "\t" + registration.getNom() + "\t" + registration.getEmail());
+                    registration.getPrenom() + "\t" + registration.getNom() + "\t" + registration.getEmail() + "\n");
             writer.close();
         } catch (ClassNotFoundException ex) {
 
