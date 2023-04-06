@@ -143,6 +143,9 @@ public class Server {
             writer.append(cours.getSession() + "\t" + cours.getCode() + "\t" + registration.getMatricule() + "\t" +
                     registration.getPrenom() + "\t" + registration.getNom() + "\t" + registration.getEmail() + "\n");
             writer.close();
+            objectOutputStream.writeObject("gg pour l'inscription à " + cours.getCode() + ", "
+                                            + registration.getPrenom() + ". ca va faire 500$ stp merci");
+            objectOutputStream.flush();
         } catch (ClassNotFoundException ex) {
 
         } catch (IOException ex) {

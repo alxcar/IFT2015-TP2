@@ -148,8 +148,11 @@ public class Client {
                 oos.writeObject("INSCRIRE ");
                 oos.flush();
                 oos.writeObject(registration);
+                System.out.println(ois.readObject());
                 disconnect();
             } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e){
                 throw new RuntimeException(e);
             }
         }
@@ -168,7 +171,7 @@ public class Client {
                 }
                 return (requestedCourses.get(index));
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("le cours exist pas dumbass");
             }
 
         }
