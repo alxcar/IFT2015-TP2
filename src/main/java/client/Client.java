@@ -163,7 +163,7 @@ public class Client {
                 }
                 return (requestedCourses.get(index));
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("le cours exist pas dumbass");
             }
 
         }
