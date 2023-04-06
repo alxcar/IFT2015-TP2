@@ -140,8 +140,11 @@ public class Client {
                 oos.writeObject("INSCRIRE ");
                 oos.flush();
                 oos.writeObject(registration);
+                System.out.println(ois.readObject());
                 disconnect();
             } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e){
                 throw new RuntimeException(e);
             }
         }
