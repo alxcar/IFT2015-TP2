@@ -26,13 +26,15 @@ public class Client {
             this.port = port;
         }
 
-        public void run() {
-            responseTray.add("*** Bienvenue au portail d'inscription de cours de l'UDEM ***\n");
-            emptyResponseTray();
-            main();
+        public void run(int type) {
+            if (type == 1) {
+                responseTray.add("*** Bienvenue au portail d'inscription de cours de l'UDEM ***\n");
+                emptyResponseTray();
+            }
+            main(type);
         }
 
-        public void main() {
+        public void main(int type) {
             try {
                 clientSocket = new Socket(IP, port);
             } catch (IOException e) {
@@ -44,7 +46,10 @@ public class Client {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            selectSemester();
+            if (type == 1) {
+                selectSemester();
+            }
+
         }
 
         private void emptyResponseTray() {
@@ -60,7 +65,7 @@ public class Client {
             }
             promptChoice(false);
             semester = availableSemesters.get(userInput-1);
-            requestCourses(semester);
+            requestCourses(semester, 1);
         }
 
         private void promptChoice(Boolean empty) {
@@ -83,7 +88,7 @@ public class Client {
             ois.close();
             clientSocket.close();
         }
-        private void requestCourses(String semester) {
+        public void requestCourses(String semester, int type) {
             //emptyResponseTray(); -- necessaire ou pas??
             responseTray.add("Les cours offerts pendant la session d'" + semester.toLowerCase() +" sont: \n");
             try {
@@ -101,15 +106,18 @@ public class Client {
                 responseTray.add(i+1 + ". " + requestedCourses.get(i).getCode() + "\t" + requestedCourses.get(i).getName() + "\n");
             }
             // Sketchy workaround, will fix later
-            promptChoice(true);
-            selectAction();
+            if (type == 1) {
+                promptChoice(true);
+                selectAction();
+            }
+
         }
         private void selectAction() {
             responseTray.add("\n1. Consulter les cours offerts pour une autre session\n");
             responseTray.add("2. Inscription à un cours\n");
             promptChoice(false);
             if(userInput == 1) {
-                run();
+                run(1);
             } else if (userInput == 2) {
                 register2Class();
             }
@@ -163,6 +171,10 @@ public class Client {
                 throw new RuntimeException(e);
             }
 
+        }
+
+        public ArrayList<Course> getCourses() {
+            return requestedCourses;
         }
 
 }
