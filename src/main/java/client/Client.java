@@ -145,16 +145,18 @@ public class Client {
                 clientSocket = new Socket(IP, port);
                 oos = new ObjectOutputStream(clientSocket.getOutputStream());
                 ois = new ObjectInputStream(clientSocket.getInputStream());
-                oos.writeObject("INSCRIRE ");
-                oos.flush();
-                oos.writeObject(registration);
+                sendForm(registration);
                 System.out.println(ois.readObject());
                 disconnect();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e){
+            } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        public void sendForm(RegistrationForm registrationForm) throws IOException {
+            oos.writeObject("INSCRIRE ");
+            oos.flush();
+            oos.writeObject(registrationForm);
         }
 
         // absolument horrible et illegal
