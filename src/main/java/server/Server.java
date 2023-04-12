@@ -11,6 +11,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Classe Serveur. Elle accepte les connexions de client et gère une requête du client, communiqué sous forme de
+ * commande. !!!
+ */
 public class Server {
 
     /**
@@ -36,7 +40,7 @@ public class Server {
     /**
      * Constructeur de la classe Serveur.
      * @param port Port auquel le serveur écoutera.
-     * @throws IOException
+     * @throws IOException Exception lancé le port est deja en utilisation ??? IDK ???
      */
     public Server(int port) throws IOException {
         this.server = new ServerSocket(port, 1);
@@ -44,6 +48,10 @@ public class Server {
         this.addEventHandler(this::handleEvents);
     }
 
+    /**
+     * Ajoute chaque EventHandler à l'ArrayList handlers
+     * @param h L'evenement à traiter
+     */
     public void addEventHandler(EventHandler h) {
         this.handlers.add(h);
     }
@@ -54,6 +62,10 @@ public class Server {
         }
     }
 
+    /**
+     * Lance le serveur et instancie les objets necessaire à l'envoie et la reception de données du client.
+     * Déconnecte le client après la reception de la commande.
+     */
     public void run() {
         while (true) {
             try {
@@ -70,6 +82,11 @@ public class Server {
         }
     }
 
+    /**
+     * reçois la commande du client et separe la commande des arguments.
+     * @throws IOException Exception lancé si objectInputStream n'est pas instancié
+     * @throws ClassNotFoundException Exception lancé si l'objet reçu n'existe pas ou n'est pas reconnu.
+     */
     public void listen() throws IOException, ClassNotFoundException {
         String line;
         if ((line = this.objectInputStream.readObject().toString()) != null) {
@@ -80,6 +97,11 @@ public class Server {
         }
     }
 
+    /**
+     * Créer une pair entre la commande et ses arguments. La commande représente la Key et les arguments sont les Values
+     * @param line Ligne de commande à traiter reçu du client.
+     * @return une pair entre la commande et les arguments. Les arguments sont accessible par la Key
+     */
     public Pair<String, String> processCommandLine(String line) {
         String[] parts = line.split(" ");
         String cmd = parts[0];
@@ -87,12 +109,22 @@ public class Server {
         return new Pair<>(cmd, args);
     }
 
+    /**
+     * Ferme la connexion précedement ouverte avec le client
+     * @throws IOException Lancé si les objects n'ont pas été instancié, donc qu'aucune connexion n'est établie
+     * avec le client.
+     */
     public void disconnect() throws IOException {
         objectOutputStream.close();
         objectInputStream.close();
         client.close();
     }
 
+    /**
+     * Appelle la methode approprié selon la commande reçu du client.
+     * @param cmd Type de commande reçu par le client. Détermine quelle methode est appellé.
+     * @param arg Arguments fournis par le client. Ils sont envoyés envoyé à la methode determiné par cmd
+     */
     public void handleEvents(String cmd, String arg) {
         if (cmd.equals(REGISTER_COMMAND)) {
             handleRegistration();
@@ -143,8 +175,8 @@ public class Server {
             writer.append(cours.getSession() + "\t" + cours.getCode() + "\t" + registration.getMatricule() + "\t" +
                     registration.getPrenom() + "\t" + registration.getNom() + "\t" + registration.getEmail() + "\n");
             writer.close();
-            objectOutputStream.writeObject("gg pour l'inscription à " + cours.getCode() + ", "
-                                            + registration.getPrenom() + ". ca va faire 500$ stp merci");
+            objectOutputStream.writeObject("Félicitations " + registration.getPrenom() + ", l'inscription au cours "
+                                            + cours.getCode() + " est réussite.");
             objectOutputStream.flush();
         } catch (ClassNotFoundException ex) {
 
