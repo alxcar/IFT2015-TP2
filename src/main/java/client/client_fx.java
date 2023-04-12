@@ -115,7 +115,7 @@ public class client_fx extends Application {
                 if (Integer.valueOf(matricule.getText()) > 99999999) {
                     throw new NumberFormatException();
                 } else if (!verifyEmail(email.getText())) {
-                    System.out.println("nn");
+                    System.out.println("Email invalide: veuillez entrer un email @umontreal.ca");
                 } else {
                     Client client = new Client("127.0.0.1", 1337);
                     client.run(0);
@@ -140,7 +140,7 @@ public class client_fx extends Application {
 
     private boolean verifyEmail(String email) {
         //marche po
-        Pattern p = Pattern.compile("\\s+@\\s+.\\s+");
+        Pattern p = Pattern.compile("(.+?)"+"@umontreal.ca");
         Matcher mat = p.matcher(email);
         return mat.matches();
     }
