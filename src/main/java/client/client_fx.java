@@ -112,8 +112,9 @@ public class client_fx extends Application {
 
         sendForm.setOnAction(e -> {
             try {
-                if (Integer.valueOf(matricule.getText()) > 99999999) {
-                    throw new NumberFormatException();
+                if (!verifyMatricule(matricule.getText())) {
+                    //throw new NumberFormatException();
+                    System.out.println("Veuillez entrer un matricule valide à 8 chiffres");
                 } else if (!verifyEmail(email.getText())) {
                     System.out.println("Email invalide: veuillez entrer un email @umontreal.ca");
                 } else {
@@ -139,9 +140,13 @@ public class client_fx extends Application {
     }
 
     private boolean verifyEmail(String email) {
-        //marche po
         Pattern p = Pattern.compile("(.+?)"+"@umontreal.ca");
         Matcher mat = p.matcher(email);
+        return mat.matches();
+    }
+    private boolean verifyMatricule(String matricule){
+        Pattern p = Pattern.compile("\\d*8");
+        Matcher mat = p.matcher(matricule);
         return mat.matches();
     }
 }
