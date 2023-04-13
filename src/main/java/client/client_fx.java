@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Classe du client avec GUI interactif
+ */
 public class client_fx extends Application {
     public static void main(String[] args) {
         launch(args);
@@ -28,6 +31,7 @@ public class client_fx extends Application {
         int width = 750;
         int height = 500;
         int padding = 20;
+        stage.setTitle("Inscription UdeM");
         HBox mainPlane = new HBox();
         VBox leftPlane = new VBox();
         leftPlane.setPadding(new Insets(padding, padding, padding, padding));
@@ -113,8 +117,7 @@ public class client_fx extends Application {
         sendForm.setOnAction(e -> {
             try {
                 if (!verifyMatricule(matricule.getText())) {
-                    //throw new NumberFormatException();
-                    System.out.println("Veuillez entrer un matricule valide à 8 chiffres");
+                    throw new NumberFormatException();
                 } else if (!verifyEmail(email.getText())) {
                     System.out.println("Email invalide: veuillez entrer un email @umontreal.ca");
                 } else {
@@ -129,7 +132,7 @@ public class client_fx extends Application {
                     }
                 }
             } catch (NumberFormatException ex) {
-                System.out.println("Matricule invalide: not an int or greater than 8 characters");
+                System.out.println("Matricule invalide: Veuillez entrer un matricule valide à 8 chiffres");
             }
 
         });
