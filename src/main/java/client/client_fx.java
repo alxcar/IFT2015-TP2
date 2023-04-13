@@ -46,7 +46,7 @@ public class client_fx extends Application {
         codeCol.setCellValueFactory(new PropertyValueFactory<>("code"));
 
         TableColumn<Course, String> coursCol = new TableColumn("Cours");
-        codeCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        coursCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         table.getColumns().addAll(codeCol, coursCol);
         // Faire fit les columns sur la longueur du tab
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
