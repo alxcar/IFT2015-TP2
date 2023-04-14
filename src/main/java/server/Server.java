@@ -15,7 +15,7 @@ import java.util.Arrays;
  * Classe Serveur. Elle accepte les connexions de client et gère une requête du client, communiqué sous forme de
  * commande. !!!
  */
-public class Server {
+public class Server extends Thread {
 
     /**
      * Le client souhaite s'inscrire à un cours.
@@ -28,24 +28,36 @@ public class Server {
     /**
      * "Socket" du serveur.
      */
-    private final ServerSocket server;
     /**
      * "Socket" du client.
      */
     private Socket client;
+    private final ArrayList<EventHandler> handlers;
     private ObjectInputStream objectInputStream;
     private ObjectOutputStream objectOutputStream;
-    private final ArrayList<EventHandler> handlers;
 
     /**
      * Constructeur de la classe Serveur.
      * @param port Port auquel le serveur écoutera.
      * @throws IOException Exception lancé le port est deja en utilisation ??? IDK ???
      */
-    public Server(int port) throws IOException {
-        this.server = new ServerSocket(port, 1);
+    public Server(Socket client, ObjectOutputStream objectOutputStream, ObjectInputStream objectInputStream) throws IOException {
+        this.client = client;
         this.handlers = new ArrayList<EventHandler>();
         this.addEventHandler(this::handleEvents);
+        this.objectOutputStream = objectOutputStream;
+        this.objectInputStream = objectInputStream;
+    }
+    public void run() {
+        try {
+            listen();
+            disconnect();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     /**
@@ -66,21 +78,7 @@ public class Server {
      * Lance le serveur et instancie les objets necessaire à l'envoie et la reception de données du client.
      * Déconnecte le client après la reception de la commande.
      */
-    public void run() {
-        while (true) {
-            try {
-                client = server.accept();
-                System.out.println("Connecté au client: " + client);
-                objectInputStream = new ObjectInputStream(client.getInputStream());
-                objectOutputStream = new ObjectOutputStream(client.getOutputStream());
-                listen();
-                disconnect();
-                System.out.println("Client déconnecté!");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
+
 
     /**
      * reçois la commande du client et separe la commande des arguments.
@@ -118,6 +116,7 @@ public class Server {
         objectOutputStream.close();
         objectInputStream.close();
         client.close();
+        System.out.println("Client déconnecté!");
     }
 
     /**
@@ -183,6 +182,33 @@ public class Server {
 
         }
 
+    }
+}
+
+class ClientRequest {
+    private final ServerSocket server;
+    private Socket client;
+    private ObjectInputStream objectInputStream;
+    private ObjectOutputStream objectOutputStream;
+
+    public ClientRequest(int port) throws IOException {
+        this.server = new ServerSocket(port, 1);
+    }
+
+    public void run() {
+        while (true) {
+            try {
+                client = server.accept();
+                System.out.println("Connecté au client: " + client);
+                objectInputStream = new ObjectInputStream(client.getInputStream());
+                objectOutputStream = new ObjectOutputStream(client.getOutputStream());
+
+                Thread serverRequest = new Server(client, objectOutputStream, objectInputStream);
+                serverRequest.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
 
