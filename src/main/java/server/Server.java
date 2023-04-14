@@ -150,7 +150,6 @@ public class Server {
                 String[] tempCourse = currentLine.split("\t");
                 if (tempCourse[2].equals(arg)) {
                     requestedCourses.add(new Course(tempCourse[1], tempCourse[0], tempCourse[2]));
-                    System.out.println(requestedCourses);
                 }
             }
             objectOutputStream.writeObject(requestedCourses);

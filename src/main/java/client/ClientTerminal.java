@@ -1,5 +1,6 @@
 package client;
 
+import client.models.Client;
 import server.models.Course;
 import server.models.RegistrationForm;
 
@@ -9,47 +10,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class Client {
-        private String IP;
-        private int port;
+public class ClientTerminal extends Client {
         private int userInput;
         private String userInfo;
-        private Socket clientSocket;
-        private ObjectOutputStream oos;
-        private ObjectInputStream ois;
         private ArrayList<String> responseTray = new ArrayList<>();
-        private ArrayList<Course> requestedCourses = new ArrayList<>();
-        private final ArrayList<String> availableSemesters = new ArrayList<>(Arrays.asList("Automne", "Hiver", "Ete"));
         private String semester;
-        public Client(String IP, int port) {
-            this.IP = IP;
-            this.port = port;
+        public ClientTerminal(String IP, int port) {
+            super(IP, port);
         }
-
-        public void run(int type) {
-            if (type == 1) {
-                responseTray.add("*** Bienvenue au portail d'inscription de cours de l'UDEM ***\n");
-                emptyResponseTray();
-            }
-            main(type);
-        }
-
-        public void main(int type) {
-            try {
-                clientSocket = new Socket(IP, port);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            try {
-                oos = new ObjectOutputStream(clientSocket.getOutputStream());
-                ois = new ObjectInputStream(clientSocket.getInputStream());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            if (type == 1) {
-                selectSemester();
-            }
-
+        @Override
+        public void run() {
+            responseTray.add("*** Bienvenue au portail d'inscription de cours de l'UDEM ***\n");
+            emptyResponseTray();
+            super.run();
+            selectSemester();
         }
 
         private void emptyResponseTray() {
@@ -65,7 +39,7 @@ public class Client {
             }
             promptChoice(false);
             semester = availableSemesters.get(userInput-1);
-            requestCourses(semester, 1);
+            requestCourses(semester);
         }
 
         private void promptChoice(Boolean empty) {
@@ -83,33 +57,16 @@ public class Client {
             userInfo = scan.next();
         }
 
-        public void disconnect() throws IOException {
-            oos.close();
-            ois.close();
-            clientSocket.close();
-        }
-        public void requestCourses(String semester, int type) {
-            //emptyResponseTray(); -- necessaire ou pas??
+        @Override
+        public void requestCourses(String semester) {
+            super.requestCourses(semester);
             responseTray.add("Les cours offerts pendant la session d'" + semester.toLowerCase() +" sont: \n");
-            try {
-                oos.writeObject("CHARGER " + semester);
-                oos.flush();
-                requestedCourses = (ArrayList<Course>) ois.readObject();
-                disconnect();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-
             for (int i = 0; i < requestedCourses.size(); i++) {
                 responseTray.add(i+1 + ". " + requestedCourses.get(i).getCode() + "\t" + requestedCourses.get(i).getName() + "\n");
             }
-            // Sketchy workaround, will fix later
-            if (type == 1) {
-                promptChoice(true);
-                selectAction();
-            }
+            emptyResponseTray();
+            promptChoice(true);
+            selectAction();
 
         }
         private void selectAction() {
@@ -117,7 +74,7 @@ public class Client {
             responseTray.add("2. Inscription à un cours\n");
             promptChoice(false);
             if(userInput == 1) {
-                run(1);
+                run();
             } else if (userInput == 2) {
                 register2Class();
             }
@@ -141,16 +98,7 @@ public class Client {
             String courseCode = userInfo;
 
             RegistrationForm registration = new RegistrationForm(firstName, name,  email, code,  findCourse(courseCode));
-            try{
-                clientSocket = new Socket(IP, port);
-                oos = new ObjectOutputStream(clientSocket.getOutputStream());
-                ois = new ObjectInputStream(clientSocket.getInputStream());
-                sendForm(registration);
-                System.out.println(ois.readObject());
-                disconnect();
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            super.register2Class(registration);
         }
 
         public void sendForm(RegistrationForm registrationForm) throws IOException {
