@@ -1,6 +1,9 @@
 package client;
 
 import client.models.Client;
+import javafx.scene.control.Alert;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import server.models.Course;
 import server.models.RegistrationForm;
@@ -37,25 +40,40 @@ public class Controller {
     }
 
     public void sendForm(String prenom, String nom, String email, String matricule) {
-        try {
+        ArrayList<String> error = new ArrayList<>();
+        view.removeBorder(view.table);
+        if (view.table.getSelectionModel().getSelectedItem() == null) {
+            view.setRedBorder(view.table);
+            error.add("Vous devez selectionner un cours!");
+            throwRrrorAlert(error);
+        } else {
+            view.removeBorder(view.email);
+            if (!verifyEmail(email)) {
+                view.setRedBorder(view.email);
+                error.add("Le champ \"Email\" est invalide!");
+            }
+            view.removeBorder(view.matricule);
             if (!verifyMatricule(matricule)) {
-                throw new NumberFormatException();
-            } else if (!verifyEmail(email)) {
-                System.out.println("Email invalide: veuillez entrer un email @umontreal.ca");
+                view.setRedBorder(view.matricule);
+                error.add("Le champ \"Matricule\" est invalide!");
+            }
+            if (!error.isEmpty()){
+                throwRrrorAlert(error);
             } else {
                 Client client = new Client("127.0.0.1", 1337);
                 client.run();
                 Course selectedCourse = view.table.getSelectionModel().getSelectedItem();
                 RegistrationForm newForm = new RegistrationForm(prenom, nom, email, matricule, selectedCourse);
+                view.clearForm();
+                successAlert(nom, prenom, selectedCourse.getCode());
                 try {
                     client.sendForm(newForm);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
             }
-        } catch (NumberFormatException ex) {
-            System.out.println("Matricule invalide: Veuillez entrer un matricule valide à 8 chiffres");
         }
+
     }
 
     private boolean verifyEmail(String email) {
@@ -64,8 +82,24 @@ public class Controller {
         return mat.matches();
     }
     private boolean verifyMatricule(String matricule){
-        Pattern p = Pattern.compile("\\d*8");
+        Pattern p = Pattern.compile("^[0-9]{8}$");
         Matcher mat = p.matcher(matricule);
         return mat.matches();
+    }
+
+    public void throwRrrorAlert(ArrayList<String> errorList) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Error");
+        alert.setContentText("Le formulaire est invalide\n" + String.join("\n", errorList));
+        alert.showAndWait();
+    }
+
+    public void successAlert(String prenom, String nom, String code) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Message");
+        alert.setHeaderText("Message");
+        alert.setContentText("Félicitations! " + nom + " " + prenom + " est inscrit(e) avec succès au cours " + code);
+        alert.showAndWait();
     }
 }

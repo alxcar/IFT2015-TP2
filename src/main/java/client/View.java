@@ -7,10 +7,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import server.models.Course;
@@ -24,6 +22,9 @@ public class View extends Application {
     private int height = 500;
     private int padding = 20;
 
+    private Stage stage;
+    private HBox mainPlane;
+
     protected TableView<Course> table;
     protected ChoiceBox sessionBox;
     private Controller controller;
@@ -31,15 +32,20 @@ public class View extends Application {
     private VBox leftPlane;
 
     private VBox rightPlane;
+    public TextField matricule;
+    public TextField email;
+    private TextField prenom;
+    private TextField nom;
     public View() {
         controller = new Controller(this);
     }
     @Override
     public void start(Stage stage) throws Exception {
+        this.stage = stage;
         stage.setTitle("Inscription UdeM");
         initLeftPane();
         initRightPane();
-        HBox mainPlane = new HBox();
+        mainPlane = new HBox();
 
 
         mainPlane.getChildren().addAll(leftPlane, rightPlane);
@@ -98,16 +104,16 @@ public class View extends Application {
         GridPane formulaire = new GridPane();
 
         formulaire.add(new Label("Prénom"), 0, 0);
-        TextField prenom = new TextField();
+        prenom = new TextField();
         formulaire.add(prenom, 1, 0);
         formulaire.add(new Label("Nom"), 0, 1);
-        TextField nom = new TextField();
+        nom = new TextField();
         formulaire.add(nom, 1, 1);
         formulaire.add(new Label("Email"), 0, 2);
-        TextField email = new TextField();
+        email = new TextField();
         formulaire.add(email, 1, 2);
         formulaire.add(new Label("Matricule"), 0, 3);
-        TextField matricule = new TextField();
+        matricule = new TextField();
         formulaire.add(matricule, 1, 3);
         Button sendForm = new Button("envoyer");
         sendForm.setAlignment(Pos.BOTTOM_RIGHT);
@@ -122,5 +128,18 @@ public class View extends Application {
         sendForm.setOnAction(e -> {
             controller.sendForm(prenom.getText(), nom.getText(), email.getText(), matricule.getText());
         });
+    }
+    public void setRedBorder(Control node) {
+        node.setBorder(new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+    }
+
+    public void removeBorder(Control node) {
+        node.setBorder(new Border(new BorderStroke(new Color(0,0,0,0), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.EMPTY)));
+    }
+    public void clearForm() {
+        prenom.clear();
+        nom.clear();
+        email.clear();
+        matricule.clear();
     }
 }
