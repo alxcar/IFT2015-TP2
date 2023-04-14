@@ -45,7 +45,7 @@ public class Controller {
         if (view.table.getSelectionModel().getSelectedItem() == null) {
             view.setRedBorder(view.table);
             error.add("Vous devez selectionner un cours!");
-            throwRrrorAlert(error);
+            view.throwErrorAlert(error);
         } else {
             view.removeBorder(view.email);
             if (!verifyEmail(email)) {
@@ -58,14 +58,14 @@ public class Controller {
                 error.add("Le champ \"Matricule\" est invalide!");
             }
             if (!error.isEmpty()){
-                throwRrrorAlert(error);
+                view.throwErrorAlert(error);
             } else {
                 Client client = new Client("127.0.0.1", 1337);
                 client.run();
                 Course selectedCourse = view.table.getSelectionModel().getSelectedItem();
                 RegistrationForm newForm = new RegistrationForm(prenom, nom, email, matricule, selectedCourse);
                 view.clearForm();
-                successAlert(nom, prenom, selectedCourse.getCode());
+                view.successAlert(nom, prenom, selectedCourse.getCode());
                 try {
                     client.sendForm(newForm);
                 } catch (IOException ex) {
@@ -85,21 +85,5 @@ public class Controller {
         Pattern p = Pattern.compile("^[0-9]{8}$");
         Matcher mat = p.matcher(matricule);
         return mat.matches();
-    }
-
-    public void throwRrrorAlert(ArrayList<String> errorList) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText("Error");
-        alert.setContentText("Le formulaire est invalide\n" + String.join("\n", errorList));
-        alert.showAndWait();
-    }
-
-    public void successAlert(String prenom, String nom, String code) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Message");
-        alert.setHeaderText("Message");
-        alert.setContentText("Félicitations! " + nom + " " + prenom + " est inscrit(e) avec succès au cours " + code);
-        alert.showAndWait();
     }
 }

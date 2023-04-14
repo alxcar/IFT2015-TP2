@@ -142,4 +142,20 @@ public class View extends Application {
         email.clear();
         matricule.clear();
     }
+
+    public void throwErrorAlert(ArrayList<String> errorList) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Error");
+        alert.setContentText("Le formulaire est invalide\n" + String.join("\n", errorList));
+        alert.showAndWait();
+    }
+
+    public void successAlert(String prenom, String nom, String code) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Message");
+        alert.setHeaderText("Message");
+        alert.setContentText("Félicitations! " + nom + " " + prenom + " est inscrit(e) avec succès au cours " + code);
+        alert.showAndWait();
+    }
 }
