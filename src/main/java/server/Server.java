@@ -12,8 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Classe Serveur. Elle accepte les connexions de client et gère une requête du client, communiqué sous forme de
- * commande. !!!
+ * Classe Serveur. Elle accepte et gère une requête du client, communiqué sous forme de commande.
  */
 public class Server extends Thread {
 
@@ -26,20 +25,28 @@ public class Server extends Thread {
      */
     public final static String LOAD_COMMAND = "CHARGER";
     /**
-     * "Socket" du serveur.
-     */
-    /**
      * "Socket" du client.
      */
     private Socket client;
+    /**
+     * Liste des handlers
+     */
     private final ArrayList<EventHandler> handlers;
+    /**
+     * ObjectInputStream entre Client -> Serveur
+     */
     private ObjectInputStream objectInputStream;
+    /**
+     * ObjectInputStream entre Client <- Serveur
+     */
     private ObjectOutputStream objectOutputStream;
 
     /**
      * Constructeur de la classe Serveur.
-     * @param port Port auquel le serveur écoutera.
      * @throws IOException Exception lancé le port est deja en utilisation ??? IDK ???
+     * @param client Socket du client ayant fait la demande
+     * @param objectInputStream InputStream entre le client et le serveur
+     * @param objectOutputStream OutputStream entre le client et le serveur
      */
     public Server(Socket client, ObjectOutputStream objectOutputStream, ObjectInputStream objectInputStream) throws IOException {
         this.client = client;
@@ -48,6 +55,12 @@ public class Server extends Thread {
         this.objectOutputStream = objectOutputStream;
         this.objectInputStream = objectInputStream;
     }
+
+    /**
+     * Override de le methode run() de Thread, elle est lancée sur un thread différent lorsque Object.start() est
+     * appelée. Elle appelle la méthode listen() pour "handle" la commande reçu, puis ferme la connection avec le
+     * client.
+     */
     public void run() {
         try {
             listen();
@@ -75,13 +88,7 @@ public class Server extends Thread {
     }
 
     /**
-     * Lance le serveur et instancie les objets necessaire à l'envoie et la reception de données du client.
-     * Déconnecte le client après la reception de la commande.
-     */
-
-
-    /**
-     * reçois la commande du client et separe la commande des arguments.
+     * Reçois la commande du client et separe la commande de ses arguments.
      * @throws IOException Exception lancé si objectInputStream n'est pas instancié
      * @throws ClassNotFoundException Exception lancé si l'objet reçu n'existe pas ou n'est pas reconnu.
      */
@@ -137,9 +144,8 @@ public class Server extends Thread {
      La méthode filtre les cours par la session spécifiée en argument.
      Ensuite, elle renvoie la liste des cours pour une session au client en utilisant l'objet 'objectOutputStream'.
      @param arg la session pour laquelle on veut récupérer la liste des cours
-     @throws Exception si une erreur se produit lors de la lecture du fichier ou de l'écriture de l'objet dans le flux
      */
-    public void handleLoadCourses(String arg) {
+    public void handleLoadCourses(String arg){
         try {
             FileReader coursesTxt = new FileReader("src/main/java/server/data/cours.txt");
             BufferedReader reader = new BufferedReader(coursesTxt);
@@ -162,7 +168,6 @@ public class Server extends Thread {
     /**
      Récupérer l'objet 'RegistrationForm' envoyé par le client en utilisant 'objectInputStream', l'enregistrer dans un fichier texte
      et renvoyer un message de confirmation au client.
-     @throws Exception si une erreur se produit lors de la lecture de l'objet, l'écriture dans un fichier ou dans le flux de sortie.
      */
     public void handleRegistration() {
         try {
@@ -182,33 +187,6 @@ public class Server extends Thread {
 
         }
 
-    }
-}
-
-class ClientRequest {
-    private final ServerSocket server;
-    private Socket client;
-    private ObjectInputStream objectInputStream;
-    private ObjectOutputStream objectOutputStream;
-
-    public ClientRequest(int port) throws IOException {
-        this.server = new ServerSocket(port, 1);
-    }
-
-    public void run() {
-        while (true) {
-            try {
-                client = server.accept();
-                System.out.println("Connecté au client: " + client);
-                objectInputStream = new ObjectInputStream(client.getInputStream());
-                objectOutputStream = new ObjectOutputStream(client.getOutputStream());
-
-                Thread serverRequest = new Server(client, objectOutputStream, objectInputStream);
-                serverRequest.start();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 }
 

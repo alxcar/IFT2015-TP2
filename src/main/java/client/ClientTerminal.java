@@ -17,11 +17,11 @@ public class ClientTerminal extends Client {
         private String semester;
         public ClientTerminal(String IP, int port) {
             super(IP, port);
+            responseTray.add("*** Bienvenue au portail d'inscription de cours de l'UDEM ***\n");
+            emptyResponseTray();
         }
         @Override
         public void run() {
-            responseTray.add("*** Bienvenue au portail d'inscription de cours de l'UDEM ***\n");
-            emptyResponseTray();
             super.run();
             selectSemester();
         }
