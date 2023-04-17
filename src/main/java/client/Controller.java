@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Classe Controller, gère les interactions entre le GUI et le serveur.
+ * Classe Controller, gère les interactions entre le View et les Models.
  */
 public class Controller {
     private View view;

@@ -5,8 +5,6 @@ import server.models.Course;
 import server.models.RegistrationForm;
 
 import java.io.*;
-import java.lang.reflect.Array;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,17 +26,8 @@ public class Server extends Thread {
      * "Socket" du client.
      */
     private Socket client;
-    /**
-     * Liste des handlers
-     */
     private final ArrayList<EventHandler> handlers;
-    /**
-     * ObjectInputStream entre Client -> Serveur
-     */
     private ObjectInputStream objectInputStream;
-    /**
-     * ObjectInputStream entre Client <- Serveur
-     */
     private ObjectOutputStream objectOutputStream;
 
     /**
@@ -147,7 +136,7 @@ public class Server extends Thread {
      */
     public void handleLoadCourses(String arg){
         try {
-            FileReader coursesTxt = new FileReader("src/main/java/server/data/cours.txt");
+            FileReader coursesTxt = new FileReader("data/cours.txt");
             BufferedReader reader = new BufferedReader(coursesTxt);
             ArrayList<Course> requestedCourses = new ArrayList<>();
             String currentLine;
@@ -172,7 +161,7 @@ public class Server extends Thread {
     public void handleRegistration() {
         try {
             RegistrationForm registration = (RegistrationForm) objectInputStream.readObject();
-            FileWriter fw = new FileWriter("src/main/java/server/data/inscription.txt", true);
+            FileWriter fw = new FileWriter("data/inscription.txt", true);
             BufferedWriter writer = new BufferedWriter(fw);
             Course cours = registration.getCourse();
             writer.append(cours.getSession() + "\t" + cours.getCode() + "\t" + registration.getMatricule() + "\t" +

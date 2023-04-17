@@ -1,5 +1,7 @@
 package client;
 
+import client.models.ClientTerminal;
+
 /**
  * Classe du client dans le terminal
  */
