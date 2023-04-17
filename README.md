@@ -95,7 +95,7 @@ public Server(Socket client, ObjectOutputStream objectOutputStream, ObjectInputS
     }
 ```
 
-- La méthode run() @Override celle de Thread, et n'a donc plus besoin de définir le client et ses différents streams, puisqu'ils se trouvent dans le constructeur de la classe
+- La méthode run() @Override déjà celle de Thread, et n'a donc plus besoin de définir le client et ses différents streams, puisqu'ils se trouvent dans le constructeur de la classe
 
 ```Java
 public void run() {
