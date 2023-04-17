@@ -17,6 +17,9 @@ import server.models.RegistrationForm;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Classe View, affiche une application d'inscription de cours avec laquelle le user interagie.
+ */
 public class View extends Application {
     private int width = 750;
     private int height = 500;
@@ -32,13 +35,39 @@ public class View extends Application {
     private VBox leftPlane;
 
     private VBox rightPlane;
-    public TextField matricule;
-    public TextField email;
+    private TextField matricule;
+    private TextField email;
     private TextField prenom;
     private TextField nom;
+
+    /**
+     * Constructeur de la classe View.
+     */
     public View() {
         controller = new Controller(this);
     }
+
+    /**
+     * Getter pour le TextField matricule.
+     * @return Le TextField matricule.
+     */
+    public TextField getMatricule() {
+        return matricule;
+    }
+
+    /**
+     * Getter pour le TextField email.
+     * @return Le TextField email.
+     */
+    public TextField getEmail() {
+        return email;
+    }
+
+    /**
+     * Creer et définie l'interface graphique
+     * @param stage Fenêtre de l'application
+     * @throws Exception
+     */
     @Override
     public void start(Stage stage) throws Exception {
         this.stage = stage;
@@ -129,13 +158,26 @@ public class View extends Application {
             controller.sendForm(prenom.getText(), nom.getText(), email.getText(), matricule.getText());
         });
     }
+
+    /**
+     * Change la couleur de la bordure d'une boite de texte en rouge.
+     * @param node Boite de texte à modifier.
+     */
     public void setRedBorder(Control node) {
         node.setBorder(new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
     }
 
+    /**
+     * Supprime toutes modifications faites à la bordure d'une boite de texte.
+     * @param node Boite de texte à restorer.
+     */
     public void removeBorder(Control node) {
         node.setBorder(new Border(new BorderStroke(new Color(0,0,0,0), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.EMPTY)));
     }
+
+    /**
+     * Efface le texte écrit dans les boites de textes prenom, nom, email, matricule.
+     */
     public void clearForm() {
         prenom.clear();
         nom.clear();
@@ -143,6 +185,10 @@ public class View extends Application {
         matricule.clear();
     }
 
+    /**
+     * Ouvre une fenêtre d'erreur qui indique les champs invalides du formulaire d'inscription.
+     * @param errorList List de messages d'erreurs des champs invalides.
+     */
     public void throwErrorAlert(ArrayList<String> errorList) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
@@ -151,6 +197,12 @@ public class View extends Application {
         alert.showAndWait();
     }
 
+    /**
+     * Ouvre une fenêtre de confirmation d'inscription.
+     * @param prenom Prenom entré par le user.
+     * @param nom Nom entré par le user.
+     * @param code Code du cours auquel le user s'est inscrit.
+     */
     public void successAlert(String prenom, String nom, String code) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Message");

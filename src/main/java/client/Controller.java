@@ -13,13 +13,24 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Classe Controller, gère les interactions entre le GUI et le serveur.
+ */
 public class Controller {
     private View view;
 
+    /**
+     * Constructeur de la classe Controller
+     * @param view GUI géné avec lequel le controller interagie.
+     */
     public Controller(View view) {
         this.view = view;
     }
 
+    /**
+     * Créer une connexion au serveur et demande a liste de cours disponible pour la session désirée. Affiche la liste
+     * de cours dans la table prévue à cette effet dans le GUI.
+     */
     public void chargerCours() {
         view.table.getItems().clear();
         Client client = new Client("127.0.0.1", 1337);
@@ -39,6 +50,14 @@ public class Controller {
         }
     }
 
+    /**
+     * S'assure que les informations fournis par le user sont valide puis créer un RegistrationForm.
+     * Se connect au serveur et envoie la demande d'inscription.
+     * @param prenom Prenom fournis par le user
+     * @param nom Nom fournis par le user
+     * @param email email fournis par le user, finissant par @umontreal.ca.
+     * @param matricule matricule à 8 chiffre fournis par le user.
+     */
     public void sendForm(String prenom, String nom, String email, String matricule) {
         ArrayList<String> error = new ArrayList<>();
         view.removeBorder(view.table);
@@ -47,14 +66,14 @@ public class Controller {
             error.add("Vous devez selectionner un cours!");
             view.throwErrorAlert(error);
         } else {
-            view.removeBorder(view.email);
+            view.removeBorder(view.getEmail());
             if (!verifyEmail(email)) {
-                view.setRedBorder(view.email);
+                view.setRedBorder(view.getEmail());
                 error.add("Le champ \"Email\" est invalide!");
             }
-            view.removeBorder(view.matricule);
+            view.removeBorder(view.getMatricule());
             if (!verifyMatricule(matricule)) {
-                view.setRedBorder(view.matricule);
+                view.setRedBorder(view.getMatricule());
                 error.add("Le champ \"Matricule\" est invalide!");
             }
             if (!error.isEmpty()){
